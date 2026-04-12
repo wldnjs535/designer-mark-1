@@ -1,0 +1,488 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  LayoutTemplate, Type, Info, Users, Palette, Download, Tags, Check, Sparkles, 
+  Image as ImageIcon, Calendar, MapPin, LayoutGrid, Paintbrush, 
+  Sunrise, Heart, Flower2, FlaskConical, Gift, Sun, Umbrella, 
+  Flame, Leaf, BookOpen, Target, Snowflake, Cloud, Zap, Moon,
+  Presentation, Waves, Plane, PartyPopper, School, Ghost, Wine
+} from 'lucide-react';
+
+const AVAILABLE_KEYWORDS = [
+  '미래교육', '청렴', '혁신', '안전한 학교', '소통', '공감', 
+  '에듀테크', '디지털 전환', '인성교육', '글로벌 역량', '지속가능', '미래핵심역량'
+];
+
+// 기존 5개 + 공모전 인기 테마 5개 추가
+const COLOR_PALETTES = [
+  { id: 'blue', name: '신뢰의 블루', bg: 'bg-gradient-to-br from-blue-600 to-indigo-900', isDarkText: false },
+  { id: 'green', name: '안전의 그린', bg: 'bg-gradient-to-br from-emerald-600 to-teal-900', isDarkText: false },
+  { id: 'purple', name: '혁신의 퍼플', bg: 'bg-gradient-to-br from-purple-600 to-fuchsia-900', isDarkText: false },
+  { id: 'orange', name: '열정의 오렌지', bg: 'bg-gradient-to-br from-orange-500 to-red-800', isDarkText: false },
+  { id: 'dark', name: '품격의 다크', bg: 'bg-gradient-to-br from-gray-800 to-black', isDarkText: false },
+  // 신규 5개
+  { id: 'coral', name: '트렌디 코랄', bg: 'bg-gradient-to-br from-rose-400 to-orange-500', isDarkText: false },
+  { id: 'cyber', name: '사이버 펑크', bg: 'bg-gradient-to-br from-indigo-900 via-purple-800 to-pink-700', isDarkText: false },
+  { id: 'pastel', name: '파스텔 드림', bg: 'bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200', isDarkText: true },
+  { id: 'minimal', name: '미니멀 실버', bg: 'bg-gradient-to-br from-gray-100 to-gray-300', isDarkText: true },
+  { id: 'sunset', name: '선셋 바이브', bg: 'bg-gradient-to-br from-amber-400 via-orange-500 to-rose-600', isDarkText: false },
+];
+
+const GENERAL_THEMES = [
+  { id: 'base', name: '기본', icon: LayoutGrid },
+  { id: 'assembly', name: '총회', icon: Presentation },
+  { id: 'science', name: '과학', icon: FlaskConical },
+  { id: 'environment', name: '환경', icon: Leaf },
+  { id: 'ocean', name: '바다', icon: Waves },
+  { id: 'passion', name: '열정', icon: Flame },
+  { id: 'reading', name: '독서', icon: BookOpen },
+  { id: 'vacation', name: '휴가', icon: Plane },
+  { id: 'festival', name: '축제', icon: PartyPopper },
+];
+
+const SEASON_THEMES = [
+  { id: 'lunar_new_year', name: '설날', icon: Sunrise },
+  { id: 'new_semester', name: '새학기', icon: School },
+  { id: 'cherry_blossom', name: '벚꽃', icon: Flower2 },
+  { id: 'chuseok', name: '추석', icon: Moon },
+  { id: 'halloween', name: '할로윈', icon: Ghost },
+  { id: 'csat', name: '수능', icon: Target },
+  { id: 'christmas', name: '크리스마스', icon: Snowflake },
+  { id: 'year_end', name: '연말', icon: Wine },
+];
+
+export default function App() {
+  const [title, setTitle] = useState('2026 미래 혁신 교육 및 청렴 선포식');
+  const [date, setDate] = useState('2026. 10. 23.(금) 14:00');
+  const [location, setLocation] = useState('교육청 본관 대강당');
+  const [target, setTarget] = useState('관내 초·중·고 교원 및 교육 관계자');
+  const [selectedKeywords, setSelectedKeywords] = useState(['미래교육', '청렴', '혁신', '안전한 학교']);
+  
+  // 변경된 UI 상태
+  const [activeTab, setActiveTab] = useState('theme'); // info, tags, theme, color
+  const [currentColor, setCurrentColor] = useState(COLOR_PALETTES[0]);
+  const [currentThemeId, setCurrentThemeId] = useState('base');
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  const showToast = (msg) => setToastMessage(msg);
+
+  const toggleKeyword = (keyword) => {
+    if (selectedKeywords.includes(keyword)) {
+      setSelectedKeywords(selectedKeywords.filter(k => k !== keyword));
+    } else {
+      if (selectedKeywords.length >= 5) {
+        showToast('키워드는 최대 5개까지만 선택할 수 있습니다.');
+        return;
+      }
+      setSelectedKeywords([...selectedKeywords, keyword]);
+    }
+  };
+
+  // 밝은/어두운 테마에 따른 텍스트 색상 및 꾸밈 요소 색상 로직
+  const titleColorCls = currentColor.isDarkText ? 'text-gray-900' : 'text-white';
+  const descColorCls = currentColor.isDarkText ? 'text-gray-800' : 'text-white/90';
+  const badgeCls = currentColor.isDarkText ? 'bg-gray-900/10 border-gray-900/20 text-gray-800' : 'bg-white/20 border-white/30 text-white';
+  const decoColorCls = currentColor.isDarkText ? 'text-gray-900 bg-gray-900' : 'text-white bg-white';
+
+  // 데코레이션 렌더링 함수
+  const renderThemeDecorations = () => {
+    const op10 = 'opacity-10';
+    const op20 = 'opacity-20';
+
+    switch(currentThemeId) {
+      case 'base':
+        return (
+          <>
+            <Sparkles className={`absolute top-10 right-10 w-32 h-32 ${decoColorCls} ${op10}`} strokeWidth={1} />
+            <div className={`absolute -bottom-20 -left-20 w-64 h-64 ${decoColorCls} opacity-5 rounded-full blur-3xl`}></div>
+          </>
+        );
+      case 'assembly': // 총회
+        return (
+          <>
+            <Presentation className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op10}`} />
+            <div className={`absolute -bottom-10 right-20 w-48 h-48 border-4 border-current ${decoColorCls} !bg-transparent opacity-10 rounded-full`}></div>
+          </>
+        );
+      case 'science': // 과학
+        return (
+          <>
+            <FlaskConical className={`absolute top-12 right-16 w-24 h-24 ${decoColorCls} ${op20} -rotate-12`} />
+            <Zap className={`absolute top-24 right-48 w-12 h-12 ${decoColorCls} ${op10}`} />
+            <div className={`absolute bottom-10 right-10 w-32 h-32 border-4 border-current ${decoColorCls} !bg-transparent opacity-10 rounded-xl rotate-45`}></div>
+          </>
+        );
+      case 'environment': // 환경
+        return (
+          <>
+            <Leaf className={`absolute top-12 right-24 w-20 h-20 ${decoColorCls} ${op20} rotate-45`} fill="currentColor" />
+            <Leaf className={`absolute bottom-20 right-12 w-16 h-16 ${decoColorCls} ${op10} -rotate-90`} />
+            <Sun className={`absolute -top-10 -right-10 w-40 h-40 ${decoColorCls} ${op10} animate-spin-slow`} />
+          </>
+        );
+      case 'ocean': // 바다
+        return (
+          <>
+            <Waves className={`absolute bottom-10 right-10 w-40 h-40 ${decoColorCls} ${op10}`} />
+            <Umbrella className={`absolute top-12 right-20 w-32 h-32 ${decoColorCls} ${op20} rotate-12`} />
+            <div className={`absolute -bottom-20 left-0 right-0 h-40 ${decoColorCls} opacity-5 blur-xl rounded-t-full`}></div>
+          </>
+        );
+      case 'passion': // 열정
+        return (
+          <>
+            <Flame className={`absolute top-10 right-16 w-32 h-32 ${decoColorCls} ${op20}`} />
+            <Sparkles className={`absolute bottom-20 right-32 w-12 h-12 ${decoColorCls} ${op10}`} />
+          </>
+        );
+      case 'reading': // 독서
+        return (
+          <>
+            <BookOpen className={`absolute bottom-16 right-16 w-28 h-28 ${decoColorCls} ${op20} -rotate-12`} />
+            <Sparkles className={`absolute top-12 right-24 w-12 h-12 ${decoColorCls} ${op10}`} />
+          </>
+        );
+      case 'vacation': // 휴가
+        return (
+          <>
+            <Plane className={`absolute top-16 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-45`} />
+            <Cloud className={`absolute top-10 right-48 w-16 h-16 ${decoColorCls} ${op10}`} fill="currentColor" />
+          </>
+        );
+      case 'festival': // 축제
+        return (
+          <>
+            <PartyPopper className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op20} -rotate-12`} />
+            <Gift className={`absolute bottom-12 right-12 w-16 h-16 ${decoColorCls} ${op10}`} />
+            <Sparkles className={`absolute top-1/2 left-10 w-10 h-10 ${decoColorCls} ${op20}`} />
+          </>
+        );
+      case 'lunar_new_year': // 설날
+        return (
+          <>
+            <Sunrise className={`absolute top-8 right-12 w-28 h-28 ${decoColorCls} ${op20}`} strokeWidth={1.5} />
+            <Cloud className={`absolute top-24 right-40 w-16 h-16 ${decoColorCls} ${op10}`} />
+            <div className={`absolute -bottom-32 -right-32 w-80 h-80 ${decoColorCls} opacity-10 rounded-full`}></div>
+          </>
+        );
+      case 'new_semester': // 새학기
+        return (
+          <>
+            <School className={`absolute top-12 right-16 w-28 h-28 ${decoColorCls} ${op20}`} />
+            <Target className={`absolute bottom-20 right-32 w-16 h-16 ${decoColorCls} ${op10} rotate-12`} />
+          </>
+        );
+      case 'cherry_blossom': // 벚꽃
+        return (
+          <>
+            <Flower2 className={`absolute top-10 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-45`} />
+            <Flower2 className={`absolute bottom-16 right-32 w-16 h-16 ${decoColorCls} ${op10} -rotate-12`} />
+            <Sparkles className={`absolute top-32 right-10 w-10 h-10 ${decoColorCls} ${op20}`} />
+          </>
+        );
+      case 'chuseok': // 추석
+        return (
+          <>
+            <Moon className={`absolute top-12 right-24 w-28 h-28 ${decoColorCls} ${op20}`} fill="currentColor" />
+            <Cloud className={`absolute top-32 right-48 w-16 h-16 ${decoColorCls} ${op10}`} fill="currentColor" />
+          </>
+        );
+      case 'halloween': // 할로윈
+        return (
+          <>
+            <Ghost className={`absolute top-16 right-20 w-28 h-28 ${decoColorCls} ${op20} rotate-12`} />
+            <Moon className={`absolute top-12 right-48 w-12 h-12 ${decoColorCls} ${op10}`} fill="currentColor" />
+          </>
+        );
+      case 'csat': // 수능
+        return (
+          <>
+            <Target className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op10}`} />
+            <Sparkles className={`absolute bottom-20 right-40 w-12 h-12 ${decoColorCls} ${op20} rotate-45`} />
+          </>
+        );
+      case 'christmas': // 크리스마스
+        return (
+          <>
+            <Snowflake className={`absolute top-10 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
+            <Snowflake className={`absolute bottom-24 right-32 w-16 h-16 ${decoColorCls} ${op10} -rotate-45`} />
+            <Gift className={`absolute bottom-12 right-12 w-20 h-20 ${decoColorCls} ${op20}`} />
+          </>
+        );
+      case 'year_end': // 연말
+        return (
+          <>
+            <Wine className={`absolute top-12 right-20 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
+            <Heart className={`absolute bottom-24 right-32 w-12 h-12 ${decoColorCls} ${op10} -rotate-12`} fill="currentColor" />
+            <Sparkles className={`absolute top-32 right-10 w-12 h-12 ${decoColorCls} ${op20}`} />
+          </>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans p-4 md:p-8">
+      {/* 헤더 */}
+      <header className="max-w-6xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <LayoutTemplate className="w-6 h-6 text-blue-600" />
+            행사 배너 메이커
+          </h1>
+          <p className="text-gray-500 text-sm mt-1">교육 및 공공기관 행사를 위한 세련된 배너를 쉽게 제작하세요.</p>
+        </div>
+        <button 
+          onClick={() => showToast('이미지 다운로드가 시작되었습니다. (미리보기 환경 시뮬레이션)')}
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
+        >
+          <Download className="w-4 h-4" />
+          이미지 다운로드
+        </button>
+      </header>
+
+      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        {/* 왼쪽: 컨트롤 패널 */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            
+            {/* 탭 네비게이션 (4개로 확장) */}
+            <div className="flex overflow-x-auto border-b border-gray-100 bg-gray-50/50 scrollbar-hide">
+              <button onClick={() => setActiveTab('info')} className={`flex-1 min-w-[80px] py-3.5 text-sm font-medium flex flex-col md:flex-row items-center justify-center gap-1.5 transition-colors ${activeTab === 'info' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <Info className="w-4 h-4" /> <span className="hidden md:inline">정보</span>
+              </button>
+              <button onClick={() => setActiveTab('tags')} className={`flex-1 min-w-[80px] py-3.5 text-sm font-medium flex flex-col md:flex-row items-center justify-center gap-1.5 transition-colors ${activeTab === 'tags' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <Tags className="w-4 h-4" /> <span className="hidden md:inline">키워드</span>
+              </button>
+              <button onClick={() => setActiveTab('theme')} className={`flex-1 min-w-[80px] py-3.5 text-sm font-medium flex flex-col md:flex-row items-center justify-center gap-1.5 transition-colors ${activeTab === 'theme' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <LayoutGrid className="w-4 h-4" /> <span className="hidden md:inline">테마</span>
+              </button>
+              <button onClick={() => setActiveTab('color')} className={`flex-1 min-w-[80px] py-3.5 text-sm font-medium flex flex-col md:flex-row items-center justify-center gap-1.5 transition-colors ${activeTab === 'color' ? 'text-blue-600 border-b-2 border-blue-600 bg-white' : 'text-gray-500 hover:text-gray-700'}`}>
+                <Paintbrush className="w-4 h-4" /> <span className="hidden md:inline">색상</span>
+              </button>
+            </div>
+
+            {/* 탭 컨텐츠 */}
+            <div className="p-6">
+              
+              {/* 기본 정보 탭 */}
+              {activeTab === 'info' && (
+                <div className="space-y-5 animate-in fade-in duration-300">
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <Type className="w-4 h-4 text-gray-400" /> 행사 제목
+                    </label>
+                    <textarea 
+                      rows={2}
+                      value={title} 
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="행사 제목을 입력하세요 (엔터키로 줄바꿈 가능)"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <Calendar className="w-4 h-4 text-gray-400" /> 행사 일시
+                    </label>
+                    <input 
+                      type="text" value={date} onChange={(e) => setDate(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <MapPin className="w-4 h-4 text-gray-400" /> 행사 장소
+                    </label>
+                    <input 
+                      type="text" value={location} onChange={(e) => setLocation(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                      <Users className="w-4 h-4 text-gray-400" /> 참석 대상
+                    </label>
+                    <input 
+                      type="text" value={target} onChange={(e) => setTarget(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* 테마(디자인) 탭 - 2개 분류로 개편 */}
+              {activeTab === 'theme' && (
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  <p className="text-sm text-gray-500 -mb-2">행사 성격이나 시즌에 맞는 테마를 선택하면 배경 아트웍이 변경됩니다.</p>
+                  
+                  {/* 대분류 1: 테마 */}
+                  <div>
+                    <label className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
+                      <LayoutGrid className="w-4 h-4 text-blue-500" /> 일반 테마
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {GENERAL_THEMES.map((theme) => {
+                        const Icon = theme.icon;
+                        const isActive = currentThemeId === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            onClick={() => setCurrentThemeId(theme.id)}
+                            className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                              isActive ? 'border-blue-500 bg-blue-50/50 text-blue-700' : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 hover:bg-white'
+                            }`}
+                          >
+                            <Icon className={`w-6 h-6 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                            <span className="text-xs font-bold">{theme.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 대분류 2: 시즌 */}
+                  <div>
+                    <label className="text-sm font-bold text-gray-800 flex items-center gap-2 mb-3 border-b border-gray-100 pb-2">
+                      <Calendar className="w-4 h-4 text-orange-500" /> 시즌 테마
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {SEASON_THEMES.map((theme) => {
+                        const Icon = theme.icon;
+                        const isActive = currentThemeId === theme.id;
+                        return (
+                          <button
+                            key={theme.id}
+                            onClick={() => setCurrentThemeId(theme.id)}
+                            className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${
+                              isActive ? 'border-blue-500 bg-blue-50/50 text-blue-700' : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-gray-200 hover:bg-white'
+                            }`}
+                          >
+                            <Icon className={`w-6 h-6 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
+                            <span className="text-xs font-bold">{theme.name}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 색상(팔레트) 탭 - 확장됨 */}
+              {activeTab === 'color' && (
+                <div className="space-y-4 animate-in fade-in duration-300">
+                  <label className="text-sm font-semibold text-gray-700 block mb-1">
+                    컬러 팔레트 선택
+                  </label>
+                  <p className="text-xs text-gray-500 mb-4">공모전과 행사에서 사랑받는 10가지 트렌디한 색상 조합입니다.</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {COLOR_PALETTES.map((color) => (
+                      <button
+                        key={color.id}
+                        onClick={() => setCurrentColor(color)}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                          currentColor.id === color.id ? 'border-blue-500 bg-blue-50/50' : 'border-gray-100 bg-gray-50 hover:bg-gray-100'
+                        }`}
+                      >
+                        <div className={`w-6 h-6 rounded-full shadow-inner ${color.bg}`}></div>
+                        <span className="font-medium text-sm text-gray-700 truncate">{color.name}</span>
+                        {currentColor.id === color.id && <Check className="w-4 h-4 ml-auto text-blue-600 shrink-0" />}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+
+        {/* 오른쪽: 라이브 프리뷰 */}
+        <div className="lg:col-span-7 relative">
+          <div className="sticky top-8">
+            <h2 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" /> Live Preview
+            </h2>
+            
+            {/* 배너 아트보드 */}
+            <div className={`relative w-full aspect-[16/9] md:aspect-[4/3] rounded-2xl shadow-xl overflow-hidden ${currentColor.bg} transition-all duration-700 ease-in-out`}>
+              
+              {/* 장식용 배경 요소들 (테마에 따라 변화) */}
+              <div className="pointer-events-none transition-opacity duration-500">
+                {renderThemeDecorations()}
+              </div>
+              
+              {/* 배너 콘텐츠 */}
+              <div className="relative h-full flex flex-col justify-between p-8 md:p-12 z-10">
+                
+                {/* 상단: 키워드 뱃지 */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {selectedKeywords.map((kw, idx) => (
+                    <span 
+                      key={idx} 
+                      className={`px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase backdrop-blur-md transition-colors duration-500 ${badgeCls}`}
+                    >
+                      {kw}
+                    </span>
+                  ))}
+                </div>
+
+                {/* 중앙: 메인 텍스트 */}
+                <div className="flex-grow flex flex-col justify-center max-w-2xl">
+                  <h1 className={`text-3xl md:text-5xl font-extrabold leading-tight mb-4 break-keep whitespace-pre-wrap transition-colors duration-500 ${titleColorCls}`}>
+                    {title || '제목을 입력해주세요'}
+                  </h1>
+                  <div className="flex flex-col gap-2.5 mt-2">
+                    <div className={`flex items-center gap-2.5 text-base md:text-lg font-medium transition-colors duration-500 ${descColorCls}`}>
+                      <Calendar className="w-5 h-5 opacity-80" />
+                      <span>{date || '일시 미지정'}</span>
+                    </div>
+                    <div className={`flex items-center gap-2.5 text-base md:text-lg font-medium transition-colors duration-500 ${descColorCls}`}>
+                      <MapPin className="w-5 h-5 opacity-80" />
+                      <span>{location || '장소 미지정'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 하단: 참석 대상 & 데코레이션 선 */}
+                <div className={`mt-8 pt-6 border-t flex items-center justify-between transition-colors duration-500 ${currentColor.isDarkText ? 'border-gray-900/20' : 'border-white/20'}`}>
+                  <div className={`flex items-center gap-2 font-medium transition-colors duration-500 ${descColorCls}`}>
+                    <Users className="w-5 h-5 opacity-80" />
+                    <span>{target || '대상 미지정'}</span>
+                  </div>
+                  <div className="hidden md:flex gap-1">
+                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-50`}></div>
+                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-70`}></div>
+                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-90`}></div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            
+            <p className="text-center text-sm text-gray-400 mt-4">
+              실제 다운로드 시 위 영역만 이미지로 저장됩니다.
+            </p>
+          </div>
+        </div>
+
+      </main>
+
+      {/* 토스트 알림창 */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 animate-in slide-in-from-bottom-5 z-50">
+          <Info className="w-5 h-5 text-blue-400" />
+          <span className="text-sm font-medium">{toastMessage}</span>
+        </div>
+      )}
+
+    </div>
+  );
+}
