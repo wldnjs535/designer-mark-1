@@ -4,8 +4,9 @@ import {
   Image as ImageIcon, Calendar, MapPin, LayoutGrid, Paintbrush, 
   BookOpen, Calculator, Languages, FlaskConical, Landmark, Globe, Palette, Music, Dumbbell, Code,
   Presentation, Lightbulb, School, Compass, Tent, Trophy, Flame, PartyPopper, Mic, Star, GraduationCap,
-  Sunrise, Backpack, Flower2, HeartHandshake, Sun, Moon, Leaf, Ghost, Target, Snowflake, Wine, CloudSnow,
-  Waves, Plane, Umbrella, Cloud, X
+  Sunrise, Backpack, Flower, HeartHandshake, Sun, Moon, Leaf, Ghost, Target, Snowflake, Wine, CloudSnow,
+  Waves, Plane, Umbrella, Cloud, X, Circle, Square, ArrowUpRight,
+  AlignLeft, AlignCenter, AlignRight, Building
 } from 'lucide-react';
 
 const AVAILABLE_KEYWORDS = [
@@ -24,21 +25,28 @@ const COLOR_PALETTES = [
   { id: 'pastel', name: '파스텔 드림', bg: 'bg-gradient-to-br from-blue-200 via-purple-200 to-pink-200', isDarkText: true },
   { id: 'minimal', name: '미니멀 실버', bg: 'bg-gradient-to-br from-gray-100 to-gray-300', isDarkText: true },
   { id: 'sunset', name: '선셋 바이브', bg: 'bg-gradient-to-br from-amber-400 via-orange-500 to-rose-600', isDarkText: false },
+  { id: 'pure_white', name: '순백의 화이트', bg: 'bg-gradient-to-br from-slate-50 to-gray-200', isDarkText: true },
+  { id: 'light_green', name: '싱그러운 연두', bg: 'bg-gradient-to-br from-lime-100 via-green-100 to-emerald-100', isDarkText: true },
+  { id: 'light_yellow', name: '포근한 연노랑', bg: 'bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-100', isDarkText: true },
+  { id: 'beige', name: '모던 베이지', bg: 'bg-gradient-to-br from-stone-200 to-stone-300', isDarkText: true },
+  { id: 'ivory', name: '클래식 아이보리', bg: 'bg-gradient-to-br from-orange-50 to-amber-50', isDarkText: true },
+  { id: 'navy', name: '미드나잇 네이비', bg: 'bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-950', isDarkText: false },
 ];
 
 const GENERAL_THEMES = [
   { id: 'base', name: '기본', icon: LayoutGrid },
-  { id: 'environment', name: '환경', icon: Leaf },
   { id: 'ocean', name: '바다', icon: Waves },
-  { id: 'passion', name: '열정', icon: Flame },
-  { id: 'reading', name: '독서', icon: BookOpen },
   { id: 'vacation', name: '휴가', icon: Plane },
+  { id: 'circle', name: '동그라미', icon: Circle },
+  { id: 'square', name: '네모', icon: Square },
+  { id: 'arrow', name: '화살표', icon: ArrowUpRight },
+  { id: 'star_shape', name: '별표', icon: Star },
 ];
 
 const SUBJECT_THEMES = [
   { id: 'korean', name: '국어', icon: BookOpen },
   { id: 'math', name: '수학', icon: Calculator },
-  { id: 'english', name: '영어', icon: Languages },
+  { id: 'english', name: '언어', icon: Languages },
   { id: 'science', name: '과학', icon: FlaskConical },
   { id: 'history', name: '역사', icon: Landmark },
   { id: 'geography', name: '지리', icon: Globe },
@@ -58,34 +66,49 @@ const EVENT_THEMES = [
   { id: 'retreat', name: '수련회', icon: Flame },
   { id: 'festival', name: '축제', icon: PartyPopper },
   { id: 'presentation', name: '발표회', icon: Mic },
-  { id: 'arts_festival', name: '학예회', icon: Star },
   { id: 'graduation', name: '졸업식', icon: GraduationCap },
 ];
 
 const SEASON_THEMES = [
   { id: 'lunar_new_year', name: '설날', icon: Sunrise },
   { id: 'new_semester', name: '새학기', icon: Backpack },
-  { id: 'cherry_blossom', name: '벚꽃', icon: Flower2 },
+  { id: 'cherry_blossom', name: '벚꽃', icon: Flower },
   { id: 'family_month', name: '가정의달', icon: HeartHandshake },
-  { id: 'summer_vacation', name: '여름방학', icon: Sun },
+  { id: 'summer_vacation', name: '여름', icon: Sun },
   { id: 'chuseok', name: '추석', icon: Moon },
   { id: 'autumn_leaves', name: '단풍', icon: Leaf },
   { id: 'halloween', name: '할로윈', icon: Ghost },
-  { id: 'csat', name: '수능', icon: Target },
   { id: 'christmas', name: '크리스마스', icon: Snowflake },
   { id: 'year_end', name: '연말', icon: Wine },
-  { id: 'winter_vacation', name: '겨울방학', icon: CloudSnow },
+  { id: 'winter_vacation', name: '겨울', icon: CloudSnow },
 ];
 
 export default function App() {
+  // 기본 텍스트 상태
   const [title, setTitle] = useState('2026 미래 혁신 교육 및 청렴 선포식');
   const [date, setDate] = useState('2026. 10. 23.(금) 14:00');
   const [location, setLocation] = useState('교육청 본관 대강당');
   const [target, setTarget] = useState('관내 초·중·고 교원 및 교육 관계자');
+  const [host, setHost] = useState('ㅇㅇ광역시교육청'); // 신규: 주최기관
+  
+  // 텍스트 크기 상태 (단위: pt)
+  const [titleSize, setTitleSize] = useState(32);
+  const [dateSize, setDateSize] = useState(12);
+  const [locationSize, setLocationSize] = useState(12);
+  const [targetSize, setTargetSize] = useState(12);
+  const [hostSize, setHostSize] = useState(12);
+
+  // 텍스트 정렬 상태 (left, center, right)
+  const [titleAlign, setTitleAlign] = useState('left');
+  const [dateAlign, setDateAlign] = useState('left');
+  const [locationAlign, setLocationAlign] = useState('left');
+  const [targetAlign, setTargetAlign] = useState('left');
+  const [hostAlign, setHostAlign] = useState('right'); // 요청하신 대로 기본은 우측
+
   const [selectedKeywords, setSelectedKeywords] = useState(['미래교육', '청렴', '혁신', '안전한 학교']);
   const [keywordInput, setKeywordInput] = useState('');
   
-  const [activeTab, setActiveTab] = useState('theme');
+  const [activeTab, setActiveTab] = useState('info'); // 작업 편의를 위해 info 탭을 기본으로 변경
   const [currentColor, setCurrentColor] = useState(COLOR_PALETTES[0]);
   const [currentThemeId, setCurrentThemeId] = useState('assembly');
   const [toastMessage, setToastMessage] = useState('');
@@ -121,298 +144,47 @@ export default function App() {
   const titleColorCls = currentColor.isDarkText ? 'text-gray-900' : 'text-white';
   const descColorCls = currentColor.isDarkText ? 'text-gray-800' : 'text-white/90';
   const badgeCls = currentColor.isDarkText ? 'bg-gray-900/10 border-gray-900/20 text-gray-800' : 'bg-white/20 border-white/30 text-white';
-  const decoColorCls = currentColor.isDarkText ? 'text-gray-900 bg-gray-900' : 'text-white bg-white';
+  const iconColorCls = currentColor.isDarkText ? 'text-gray-900' : 'text-white';
+
+  // 정렬에 필요한 Tailwind 클래스 변환 맵
+  const alignClassMap = { left: 'justify-start', center: 'justify-center', right: 'justify-end' };
+  const textAlignMap = { left: 'text-left', center: 'text-center', right: 'text-right' };
+
+  // 공통 UI 컴포넌트 (정렬 버튼)
+  const renderAlignButtons = (currentAlign, setAlign) => (
+    <div className="flex bg-gray-100 p-0.5 rounded-md">
+      <button onClick={() => setAlign('left')} className={`p-1 rounded ${currentAlign === 'left' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:bg-gray-200'} transition-colors`}><AlignLeft className="w-3.5 h-3.5" /></button>
+      <button onClick={() => setAlign('center')} className={`p-1 rounded ${currentAlign === 'center' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:bg-gray-200'} transition-colors`}><AlignCenter className="w-3.5 h-3.5" /></button>
+      <button onClick={() => setAlign('right')} className={`p-1 rounded ${currentAlign === 'right' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:bg-gray-200'} transition-colors`}><AlignRight className="w-3.5 h-3.5" /></button>
+    </div>
+  );
+
+  // 공통 UI 컴포넌트 (크기 조절기)
+  const renderSizeInput = (currentSize, setSize, min = 10, max = 80) => (
+    <div className="flex items-center gap-1.5 bg-gray-100 px-2 py-1 rounded-md">
+      <span className="text-[10px] text-gray-500 font-medium">크기</span>
+      <input type="number" value={currentSize} onChange={(e) => setSize(Number(e.target.value))} className="w-10 bg-white border border-gray-200 rounded px-1 py-0.5 text-xs text-center focus:outline-none focus:border-blue-400" min={min} max={max} />
+      <span className="text-[10px] text-gray-500">pt</span>
+    </div>
+  );
 
   const renderThemeDecorations = () => {
     const op10 = 'opacity-10';
     const op20 = 'opacity-20';
+    const op5 = 'opacity-5';
 
-    switch(currentThemeId) {
-      // --- 일반 테마 ---
-      case 'base':
-        return (
-          <>
-            <Sparkles className={`absolute top-10 right-10 w-32 h-32 ${decoColorCls} ${op10}`} strokeWidth={1} />
-            <div className={`absolute -bottom-20 -left-20 w-64 h-64 ${decoColorCls} opacity-5 rounded-full blur-3xl`}></div>
-          </>
-        );
-      case 'environment':
-        return (
-          <>
-            <Leaf className={`absolute top-12 right-24 w-20 h-20 ${decoColorCls} ${op20} rotate-45`} fill="currentColor" />
-            <Leaf className={`absolute bottom-20 right-12 w-16 h-16 ${decoColorCls} ${op10} -rotate-90`} />
-            <Sun className={`absolute -top-10 -right-10 w-40 h-40 ${decoColorCls} ${op10} animate-spin-slow`} />
-          </>
-        );
-      case 'ocean':
-        return (
-          <>
-            <Waves className={`absolute bottom-10 right-10 w-40 h-40 ${decoColorCls} ${op10}`} />
-            <Umbrella className={`absolute top-12 right-20 w-32 h-32 ${decoColorCls} ${op20} rotate-12`} />
-            <div className={`absolute -bottom-20 left-0 right-0 h-40 ${decoColorCls} opacity-5 blur-xl rounded-t-full`}></div>
-          </>
-        );
-      case 'passion':
-        return (
-          <>
-            <Flame className={`absolute top-10 right-16 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <Sparkles className={`absolute bottom-20 right-32 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'reading':
-        return (
-          <>
-            <BookOpen className={`absolute bottom-16 right-16 w-28 h-28 ${decoColorCls} ${op20} -rotate-12`} />
-            <Sparkles className={`absolute top-12 right-24 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'vacation':
-        return (
-          <>
-            <Plane className={`absolute top-16 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-45`} />
-            <Cloud className={`absolute top-10 right-48 w-16 h-16 ${decoColorCls} ${op10}`} fill="currentColor" />
-          </>
-        );
+    const ALL_THEMES = [...GENERAL_THEMES, ...SUBJECT_THEMES, ...EVENT_THEMES, ...SEASON_THEMES];
+    const currentTheme = ALL_THEMES.find(t => t.id === currentThemeId) || GENERAL_THEMES[0];
+    const ActiveIcon = currentTheme.icon;
 
-      // --- 과목 테마 ---
-      case 'korean':
-        return (
-          <>
-            <BookOpen className={`absolute top-10 right-16 w-32 h-32 ${decoColorCls} ${op20} -rotate-12`} />
-            <Type className={`absolute bottom-20 right-32 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'math':
-        return (
-          <>
-            <Calculator className={`absolute top-12 right-20 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
-            <div className={`absolute bottom-16 right-32 w-20 h-20 border-4 border-current ${decoColorCls} !bg-transparent opacity-10 rounded-lg rotate-45`}></div>
-          </>
-        );
-      case 'english':
-        return (
-          <>
-            <Languages className={`absolute top-16 right-16 w-28 h-28 ${decoColorCls} ${op20}`} />
-            <Globe className={`absolute bottom-20 right-48 w-16 h-16 ${decoColorCls} ${op10} animate-spin-slow`} />
-          </>
-        );
-      case 'science':
-        return (
-          <>
-            <FlaskConical className={`absolute top-12 right-16 w-24 h-24 ${decoColorCls} ${op20} -rotate-12`} />
-            <Sparkles className={`absolute bottom-20 right-32 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'history':
-        return (
-          <>
-            <Landmark className={`absolute top-16 right-20 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <div className={`absolute -bottom-20 right-10 w-48 h-48 ${decoColorCls} opacity-5 rounded-full`}></div>
-          </>
-        );
-      case 'geography':
-        return (
-          <>
-            <Globe className={`absolute top-10 right-16 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <MapPin className={`absolute bottom-24 right-40 w-12 h-12 ${decoColorCls} ${op10} -rotate-12`} />
-          </>
-        );
-      case 'art':
-        return (
-          <>
-            <Palette className={`absolute top-12 right-20 w-28 h-28 ${decoColorCls} ${op20} rotate-12`} />
-            <Paintbrush className={`absolute bottom-20 right-32 w-16 h-16 ${decoColorCls} ${op10} -rotate-45`} />
-          </>
-        );
-      case 'music':
-        return (
-          <>
-            <Music className={`absolute top-16 right-24 w-24 h-24 ${decoColorCls} ${op20} -rotate-12`} />
-            <Music className={`absolute bottom-24 right-48 w-12 h-12 ${decoColorCls} ${op10} rotate-12`} />
-          </>
-        );
-      case 'pe':
-        return (
-          <>
-            <Dumbbell className={`absolute top-12 right-20 w-28 h-28 ${decoColorCls} ${op20} -rotate-45`} />
-            <Trophy className={`absolute bottom-20 right-32 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'coding':
-        return (
-          <>
-            <Code className={`absolute top-16 right-20 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <LayoutGrid className={`absolute bottom-24 right-48 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-
-      // --- 행사 테마 ---
-      case 'assembly':
-        return (
-          <>
-            <Presentation className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op10}`} />
-            <div className={`absolute -bottom-10 right-20 w-48 h-48 border-4 border-current ${decoColorCls} !bg-transparent opacity-10 rounded-full`}></div>
-          </>
-        );
-      case 'training':
-        return (
-          <>
-            <Lightbulb className={`absolute top-12 right-24 w-28 h-28 ${decoColorCls} ${op20} rotate-12`} />
-            <Users className={`absolute bottom-20 right-40 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'entrance':
-        return (
-          <>
-            <School className={`absolute top-16 right-20 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <Sparkles className={`absolute bottom-24 right-48 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'orientation':
-        return (
-          <>
-            <Compass className={`absolute top-12 right-20 w-28 h-28 ${decoColorCls} ${op20} animate-spin-slow`} />
-            <MapPin className={`absolute bottom-20 right-40 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'picnic':
-        return (
-          <>
-            <Tent className={`absolute top-16 right-24 w-28 h-28 ${decoColorCls} ${op20}`} />
-            <Sun className={`absolute bottom-24 right-48 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'sports_day':
-        return (
-          <>
-            <Trophy className={`absolute top-12 right-20 w-28 h-28 ${decoColorCls} ${op20} rotate-12`} />
-            <Star className={`absolute bottom-20 right-40 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'retreat':
-        return (
-          <>
-            <Flame className={`absolute top-16 right-24 w-28 h-28 ${decoColorCls} ${op20}`} />
-            <Moon className={`absolute top-10 right-48 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'festival':
-        return (
-          <>
-            <PartyPopper className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op20} -rotate-12`} />
-            <Sparkles className={`absolute bottom-20 right-40 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'presentation':
-        return (
-          <>
-            <Mic className={`absolute top-12 right-20 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
-            <Sparkles className={`absolute bottom-24 right-32 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'arts_festival':
-        return (
-          <>
-            <Star className={`absolute top-16 right-20 w-28 h-28 ${decoColorCls} ${op20} -rotate-12`} />
-            <Palette className={`absolute bottom-20 right-40 w-16 h-16 ${decoColorCls} ${op10} rotate-12`} />
-          </>
-        );
-      case 'graduation':
-        return (
-          <>
-            <GraduationCap className={`absolute top-12 right-20 w-32 h-32 ${decoColorCls} ${op20} rotate-12`} />
-            <Star className={`absolute bottom-24 right-48 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-
-      // --- 시즌 테마 ---
-      case 'lunar_new_year':
-        return (
-          <>
-            <Sunrise className={`absolute top-8 right-12 w-28 h-28 ${decoColorCls} ${op20}`} />
-            <div className={`absolute -bottom-32 -right-32 w-80 h-80 ${decoColorCls} opacity-10 rounded-full`}></div>
-          </>
-        );
-      case 'new_semester':
-        return (
-          <>
-            <Backpack className={`absolute top-16 right-20 w-28 h-28 ${decoColorCls} ${op20}`} />
-            <BookOpen className={`absolute bottom-20 right-48 w-12 h-12 ${decoColorCls} ${op10} -rotate-12`} />
-          </>
-        );
-      case 'cherry_blossom':
-        return (
-          <>
-            <Flower2 className={`absolute top-10 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-45`} />
-            <Flower2 className={`absolute bottom-16 right-32 w-16 h-16 ${decoColorCls} ${op10} -rotate-12`} />
-          </>
-        );
-      case 'family_month':
-        return (
-          <>
-            <HeartHandshake className={`absolute top-12 right-20 w-28 h-28 ${decoColorCls} ${op20} -rotate-12`} />
-            <Flower2 className={`absolute bottom-24 right-40 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'summer_vacation':
-        return (
-          <>
-            <Sun className={`absolute top-12 right-20 w-32 h-32 ${decoColorCls} ${op20} animate-spin-slow`} />
-            <Compass className={`absolute bottom-20 right-48 w-16 h-16 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'chuseok':
-        return (
-          <>
-            <Moon className={`absolute top-12 right-24 w-28 h-28 ${decoColorCls} ${op20}`} fill="currentColor" />
-            <Star className={`absolute bottom-24 right-40 w-10 h-10 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'autumn_leaves':
-        return (
-          <>
-            <Leaf className={`absolute top-16 right-20 w-24 h-24 ${decoColorCls} ${op20} -rotate-45`} />
-            <Leaf className={`absolute bottom-20 right-40 w-16 h-16 ${decoColorCls} ${op10} rotate-12`} />
-          </>
-        );
-      case 'halloween':
-        return (
-          <>
-            <Ghost className={`absolute top-16 right-20 w-28 h-28 ${decoColorCls} ${op20} rotate-12`} />
-            <Moon className={`absolute top-12 right-48 w-12 h-12 ${decoColorCls} ${op10}`} fill="currentColor" />
-          </>
-        );
-      case 'csat':
-        return (
-          <>
-            <Target className={`absolute top-12 right-16 w-32 h-32 ${decoColorCls} ${op10}`} />
-            <Sparkles className={`absolute bottom-20 right-40 w-12 h-12 ${decoColorCls} ${op20} rotate-45`} />
-          </>
-        );
-      case 'christmas':
-        return (
-          <>
-            <Snowflake className={`absolute top-10 right-16 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
-            <Snowflake className={`absolute bottom-24 right-32 w-16 h-16 ${decoColorCls} ${op10} -rotate-45`} />
-          </>
-        );
-      case 'year_end':
-        return (
-          <>
-            <Wine className={`absolute top-12 right-20 w-24 h-24 ${decoColorCls} ${op20} rotate-12`} />
-            <Sparkles className={`absolute bottom-24 right-40 w-12 h-12 ${decoColorCls} ${op10}`} />
-          </>
-        );
-      case 'winter_vacation':
-        return (
-          <>
-            <CloudSnow className={`absolute top-16 right-20 w-32 h-32 ${decoColorCls} ${op20}`} />
-            <Snowflake className={`absolute bottom-24 right-48 w-12 h-12 ${decoColorCls} ${op10} rotate-45`} />
-          </>
-        );
-      default:
-        return null;
-    }
+    return (
+      <>
+        <ActiveIcon className={`absolute top-10 right-16 w-36 h-36 ${iconColorCls} ${op20} -rotate-12 transition-all duration-500`} />
+        <ActiveIcon className={`absolute bottom-24 right-40 w-16 h-16 ${iconColorCls} ${op10} rotate-12 transition-all duration-500`} />
+        <ActiveIcon className={`absolute -bottom-20 -left-16 w-80 h-80 ${iconColorCls} ${op5} -rotate-45 blur-sm transition-all duration-500`} />
+        <Sparkles className={`absolute top-24 right-1/3 w-8 h-8 ${iconColorCls} ${op10} animate-pulse`} />
+      </>
+    );
   };
 
   return (
@@ -459,46 +231,98 @@ export default function App() {
               
               {/* 기본 정보 탭 */}
               {activeTab === 'info' && (
-                <div className="space-y-5 animate-in fade-in duration-300">
+                <div className="space-y-6 animate-in fade-in duration-300">
+                  
+                  {/* 행사 제목 */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                      <Type className="w-4 h-4 text-gray-400" /> 행사 제목
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <Type className="w-4 h-4 text-gray-400" /> 행사 제목
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {renderAlignButtons(titleAlign, setTitleAlign)}
+                        {renderSizeInput(titleSize, setTitleSize, 10, 80)}
+                      </div>
+                    </div>
                     <textarea 
-                      rows={2}
-                      value={title} 
-                      onChange={(e) => setTitle(e.target.value)}
+                      rows={2} value={title} onChange={(e) => setTitle(e.target.value)}
                       className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                       placeholder="행사 제목을 입력하세요 (엔터키로 줄바꿈 가능)"
                     />
                   </div>
+
+                  {/* 행사 일시 */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                      <Calendar className="w-4 h-4 text-gray-400" /> 행사 일시
-                    </label>
-                    <input 
-                      type="text" value={date} onChange={(e) => setDate(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <Calendar className="w-4 h-4 text-gray-400" /> 행사 일시
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {renderAlignButtons(dateAlign, setDateAlign)}
+                        {renderSizeInput(dateSize, setDateSize, 10, 50)}
+                      </div>
+                    </div>
+                    <textarea 
+                      rows={2} value={date} onChange={(e) => setDate(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="행사 일시를 입력하세요 (엔터키로 줄바꿈 가능)"
                     />
                   </div>
+
+                  {/* 행사 장소 */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                      <MapPin className="w-4 h-4 text-gray-400" /> 행사 장소
-                    </label>
-                    <input 
-                      type="text" value={location} onChange={(e) => setLocation(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <MapPin className="w-4 h-4 text-gray-400" /> 행사 장소
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {renderAlignButtons(locationAlign, setLocationAlign)}
+                        {renderSizeInput(locationSize, setLocationSize, 10, 50)}
+                      </div>
+                    </div>
+                    <textarea 
+                      rows={2} value={location} onChange={(e) => setLocation(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="행사 장소를 입력하세요 (엔터키로 줄바꿈 가능)"
                     />
                   </div>
+
+                  {/* 참석 대상 */}
                   <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
-                      <Users className="w-4 h-4 text-gray-400" /> 참석 대상
-                    </label>
-                    <input 
-                      type="text" value={target} onChange={(e) => setTarget(e.target.value)}
-                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none"
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <Users className="w-4 h-4 text-gray-400" /> 참석 대상
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {renderAlignButtons(targetAlign, setTargetAlign)}
+                        {renderSizeInput(targetSize, setTargetSize, 10, 50)}
+                      </div>
+                    </div>
+                    <textarea 
+                      rows={2} value={target} onChange={(e) => setTarget(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="참석 대상을 입력하세요 (엔터키로 줄바꿈 가능)"
                     />
                   </div>
+
+                  {/* 주최기관 (신규) */}
+                  <div className="pt-2 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-2 mt-2">
+                      <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                        <Building className="w-4 h-4 text-purple-400" /> 주최기관
+                      </label>
+                      <div className="flex items-center gap-2">
+                        {renderAlignButtons(hostAlign, setHostAlign)}
+                        {renderSizeInput(hostSize, setHostSize, 10, 50)}
+                      </div>
+                    </div>
+                    <textarea 
+                      rows={2} value={host} onChange={(e) => setHost(e.target.value)}
+                      className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                      placeholder="주최기관을 입력하세요 (엔터키로 줄바꿈 가능)"
+                    />
+                  </div>
+
                 </div>
               )}
 
@@ -521,10 +345,7 @@ export default function App() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault();
-                          // 한글 입력기(IME) 조합 중 엔터를 칠 때 이벤트가 두 번 발생하는 것을 방지
-                          if (!e.nativeEvent.isComposing) {
-                            handleAddCustomKeyword();
-                          }
+                          if (!e.nativeEvent.isComposing) handleAddCustomKeyword();
                         }
                       }}
                       placeholder="키워드를 입력하고 엔터를 누르세요"
@@ -725,32 +546,46 @@ export default function App() {
                 </div>
 
                 {/* 중앙: 메인 텍스트 */}
-                <div className="flex-grow flex flex-col justify-center max-w-2xl">
-                  <h1 className={`text-3xl md:text-5xl font-extrabold leading-tight mb-4 break-keep whitespace-pre-wrap transition-colors duration-500 ${titleColorCls}`}>
+                <div className="flex-grow flex flex-col justify-center max-w-none w-full">
+                  <h1 
+                    className={`font-extrabold leading-tight mb-4 break-keep whitespace-pre-wrap transition-colors duration-500 w-full ${titleColorCls} ${textAlignMap[titleAlign]}`}
+                    style={{ fontSize: `${titleSize}pt` }}
+                  >
                     {title || '제목을 입력해주세요'}
                   </h1>
                   <div className="flex flex-col gap-2.5 mt-2">
-                    <div className={`flex items-center gap-2.5 text-base md:text-lg font-medium transition-colors duration-500 ${descColorCls}`}>
-                      <Calendar className="w-5 h-5 opacity-80" />
-                      <span>{date || '일시 미지정'}</span>
+                    <div 
+                      className={`flex items-start gap-2.5 font-medium transition-colors duration-500 w-full ${descColorCls} ${alignClassMap[dateAlign]}`}
+                      style={{ fontSize: `${dateSize}pt` }}
+                    >
+                      <Calendar className="w-6 h-6 opacity-80 shrink-0 mt-[0.15em]" />
+                      <span className={`whitespace-pre-wrap break-keep ${textAlignMap[dateAlign]}`}>{date || '일시 미지정'}</span>
                     </div>
-                    <div className={`flex items-center gap-2.5 text-base md:text-lg font-medium transition-colors duration-500 ${descColorCls}`}>
-                      <MapPin className="w-5 h-5 opacity-80" />
-                      <span>{location || '장소 미지정'}</span>
+                    <div 
+                      className={`flex items-start gap-2.5 font-medium transition-colors duration-500 w-full ${descColorCls} ${alignClassMap[locationAlign]}`}
+                      style={{ fontSize: `${locationSize}pt` }}
+                    >
+                      <MapPin className="w-6 h-6 opacity-80 shrink-0 mt-[0.15em]" />
+                      <span className={`whitespace-pre-wrap break-keep ${textAlignMap[locationAlign]}`}>{location || '장소 미지정'}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* 하단: 참석 대상 & 데코레이션 선 */}
-                <div className={`mt-8 pt-6 border-t flex items-center justify-between transition-colors duration-500 ${currentColor.isDarkText ? 'border-gray-900/20' : 'border-white/20'}`}>
-                  <div className={`flex items-center gap-2 font-medium transition-colors duration-500 ${descColorCls}`}>
-                    <Users className="w-5 h-5 opacity-80" />
-                    <span>{target || '대상 미지정'}</span>
+                {/* 하단: 참석 대상 & 주최기관 */}
+                <div className={`mt-8 pt-6 border-t flex flex-row items-start justify-between gap-4 transition-colors duration-500 ${currentColor.isDarkText ? 'border-gray-900/20' : 'border-white/20'}`}>
+                  <div 
+                    className={`w-[70%] flex items-start gap-2 font-medium transition-colors duration-500 ${descColorCls} ${alignClassMap[targetAlign]}`}
+                    style={{ fontSize: `${targetSize}pt` }}
+                  >
+                    <Users className="w-5 h-5 opacity-80 shrink-0 mt-[0.15em]" />
+                    <span className={`whitespace-pre-wrap break-keep ${textAlignMap[targetAlign]}`}>{target || '대상 미지정'}</span>
                   </div>
-                  <div className="hidden md:flex gap-1">
-                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-50`}></div>
-                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-70`}></div>
-                    <div className={`w-2 h-2 rounded-full ${decoColorCls} opacity-90`}></div>
+                  {/* 신규: 주최기관 */}
+                  <div 
+                    className={`w-[30%] flex items-start gap-2 font-extrabold transition-colors duration-500 ${titleColorCls} ${alignClassMap[hostAlign]}`}
+                    style={{ fontSize: `${hostSize}pt` }}
+                  >
+                    <span className={`whitespace-pre-wrap break-keep w-full ${textAlignMap[hostAlign]}`}>{host || '주최기관 미지정'}</span>
                   </div>
                 </div>
 
