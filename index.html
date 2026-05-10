@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutTemplate, Type, Info, Users, Download, Tags, Check, Sparkles, 
   Image as ImageIcon, Calendar, MapPin, LayoutGrid, Paintbrush, 
@@ -6,7 +6,7 @@ import {
   Presentation, Lightbulb, School, Compass, Tent, Trophy, Flame, PartyPopper, Mic, Star, GraduationCap,
   Sunrise, Backpack, Flower, HeartHandshake, Sun, Moon, Leaf, Ghost, Target, Snowflake, Wine, CloudSnow,
   Waves, Plane, Umbrella, Cloud, X, Circle, Square, ArrowUpRight,
-  AlignLeft, AlignCenter, AlignRight, Building
+  AlignLeft, AlignCenter, AlignRight, Building, ChevronDown, FileText
 } from 'lucide-react';
 
 const AVAILABLE_KEYWORDS = [
@@ -103,15 +103,17 @@ export default function App() {
   const [dateAlign, setDateAlign] = useState('left');
   const [locationAlign, setLocationAlign] = useState('left');
   const [targetAlign, setTargetAlign] = useState('left');
-  const [hostAlign, setHostAlign] = useState('right'); // 요청하신 대로 기본은 우측
+  const [hostAlign, setHostAlign] = useState('right'); // 기본은 우측
 
   const [selectedKeywords, setSelectedKeywords] = useState(['미래교육', '청렴', '혁신', '안전한 학교']);
   const [keywordInput, setKeywordInput] = useState('');
   
-  const [activeTab, setActiveTab] = useState('info'); // 작업 편의를 위해 info 탭을 기본으로 변경
+  const [activeTab, setActiveTab] = useState('info'); 
   const [currentColor, setCurrentColor] = useState(COLOR_PALETTES[0]);
   const [currentThemeId, setCurrentThemeId] = useState('assembly');
   const [toastMessage, setToastMessage] = useState('');
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const bannerRef = useRef(null);
 
   useEffect(() => {
     if (toastMessage) {
@@ -121,6 +123,12 @@ export default function App() {
   }, [toastMessage]);
 
   const showToast = (msg) => setToastMessage(msg);
+
+  const handleDownload = (format) => {
+    setShowDownloadMenu(false);
+    showToast(`${format.toUpperCase()} 파일로 다운로드가 시작되었습니다. (미리보기 환경 시뮬레이션)`);
+    // 실제 기능 구현 시: bannerRef.current 요소를 html2canvas 및 jsPDF 라이브러리를 사용하여 캡처 후 저장하는 로직이 들어갑니다.
+  };
 
   const handleAddCustomKeyword = () => {
     const trimmed = keywordInput.trim();
@@ -182,7 +190,6 @@ export default function App() {
         <ActiveIcon className={`absolute top-10 right-16 w-36 h-36 ${iconColorCls} ${op20} -rotate-12 transition-all duration-500`} />
         <ActiveIcon className={`absolute bottom-24 right-40 w-16 h-16 ${iconColorCls} ${op10} rotate-12 transition-all duration-500`} />
         <ActiveIcon className={`absolute -bottom-20 -left-16 w-80 h-80 ${iconColorCls} ${op5} -rotate-45 blur-sm transition-all duration-500`} />
-        <Sparkles className={`absolute top-24 right-1/3 w-8 h-8 ${iconColorCls} ${op10} animate-pulse`} />
       </>
     );
   };
@@ -198,13 +205,41 @@ export default function App() {
           </h1>
           <p className="text-gray-500 text-sm mt-1">교육 및 공공기관 행사를 위한 세련된 배너를 쉽게 제작하세요.</p>
         </div>
-        <button 
-          onClick={() => showToast('이미지 다운로드가 시작되었습니다. (미리보기 환경 시뮬레이션)')}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
-        >
-          <Download className="w-4 h-4" />
-          이미지 다운로드
-        </button>
+        
+        <div className="relative">
+          <button 
+            onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-sm"
+          >
+            <Download className="w-4 h-4" />
+            다운로드
+            <ChevronDown className={`w-4 h-4 ml-1 transition-transform ${showDownloadMenu ? 'rotate-180' : ''}`} />
+          </button>
+
+          {showDownloadMenu && (
+            <>
+              {/* 바깥 영역 클릭 시 닫히도록 하는 투명 배경 */}
+              <div className="fixed inset-0 z-40" onClick={() => setShowDownloadMenu(false)}></div>
+              
+              <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                <button
+                  onClick={() => handleDownload('pdf')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left border-b border-gray-50"
+                >
+                  <FileText className="w-4 h-4 text-red-500" />
+                  <span>PDF 파일 (.pdf)</span>
+                </button>
+                <button
+                  onClick={() => handleDownload('jpg')}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors text-left"
+                >
+                  <ImageIcon className="w-4 h-4 text-blue-500" />
+                  <span>JPG 이미지 (.jpg)</span>
+                </button>
+              </div>
+            </>
+          )}
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -523,7 +558,7 @@ export default function App() {
             </h2>
             
             {/* 배너 아트보드 */}
-            <div className={`relative w-full aspect-[16/9] md:aspect-[4/3] rounded-2xl shadow-xl overflow-hidden ${currentColor.bg} transition-all duration-700 ease-in-out`}>
+            <div ref={bannerRef} className={`relative w-full aspect-[16/9] md:aspect-[4/3] rounded-2xl shadow-xl overflow-hidden ${currentColor.bg} transition-all duration-700 ease-in-out`}>
               
               {/* 장식용 배경 요소들 (테마에 따라 변화) */}
               <div className="pointer-events-none transition-opacity duration-500">
